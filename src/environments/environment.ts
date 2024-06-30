@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'localhost/api'
+  apiUrl: 'birdegop.ru/api'
 };
 
 /*
