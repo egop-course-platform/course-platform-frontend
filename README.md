@@ -1,5 +1,7 @@
 # CoursePlatformFrontend
 
+[![Deploy egop runner](https://github.com/egop-course-platform/course-platform-frontend/actions/workflows/deploy.yml/badge.svg?branch=master)](https://github.com/egop-course-frontend/course-platform-frontend/actions/workflows/deploy.yml)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.2.
 
 ## Development server

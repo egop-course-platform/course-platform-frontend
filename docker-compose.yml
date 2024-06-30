@@ -1,0 +1,13 @@
+﻿version: "3"
+
+networks:
+  course-platform:
+    external: true
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: .Dockerfile
+    networks:
+      - course-platform

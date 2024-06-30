@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import mirrorsharp from 'mirrorsharp-codemirror-6-preview';
+import {environment} from "../environments/environment";
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     const initial = this.getLanguageAndCode();
     const ms = mirrorsharp(this.editorContainer.nativeElement, {
-      serviceUrl: 'ws://localhost:5200/mirrorsharp',
+      serviceUrl: `ws://${environment.apiUrl}/mirrorsharp`,
       language: initial.language,
       text: initial.code,
       serverOptions: (initial.mode !== 'regular' ? {'x-mode': initial.mode} : {})
