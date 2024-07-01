@@ -1,0 +1,54 @@
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import mirrorsharp from "mirrorsharp-codemirror-6-preview";
+import {environment} from "src/environments/environment";
+
+@Component({
+  selector: 'app-code-editor',
+  templateUrl: './code-editor.component.html',
+  styleUrls: ['./code-editor.component.scss']
+})
+export class CodeEditorComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('editorcontainer') editorContainer: ElementRef<HTMLElement> = null!;
+
+  @Input('code') code: string = '';
+
+  constructor() {
+  }
+
+  ngOnInit(): void {
+  }
+
+  getLanguageAndCode() {
+    const params = window.location.hash.replace(/^\#/, '').split('&').reduce((result, item) => {
+      const [key, value] = item.split('=');
+      // @ts-ignore
+      result[key] = value;
+      return result;
+    }, {});
+    // @ts-ignore
+    const language = (params['language'] || 'CSharp').replace('Sharp', '#');
+    // @ts-ignore
+    const mode = params['mode'] || 'regular';
+
+    return {language, mode, code: this.code};
+  }
+
+  ngAfterViewInit(): void {
+
+    const initial = this.getLanguageAndCode();
+    const ms = mirrorsharp(this.editorContainer.nativeElement, {
+      serviceUrl: `ws://${environment.apiUrl}/mirrorsharp`,
+      language: initial.language,
+      text: initial.code,
+      serverOptions: (initial.mode !== 'regular' ? {'x-mode': initial.mode} : {})
+    });
+    window.addEventListener('hashchange', () => {
+      const updated = this.getLanguageAndCode();
+      ms.setLanguage(updated.language);
+      ms.setServerOptions({'x-mode': updated.mode});
+      ms.setText(updated.code);
+    });
+  }
+
+}

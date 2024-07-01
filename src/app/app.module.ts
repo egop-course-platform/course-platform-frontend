@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import {HttpClientModule} from "@angular/common/http";
-import { LandingComponent } from './pages/landing/landing.component';
 import {RouterModule, Routes} from "@angular/router";
 
 const routes: Routes = [
@@ -28,6 +27,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes)
   ],
   providers: [],
+  exports: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
