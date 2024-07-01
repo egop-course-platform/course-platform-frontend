@@ -8,6 +8,11 @@ import {HttpClient} from "@angular/common/http";
 })
 export class PlaygroundComponent implements OnInit {
 
+  // language=C#
+  defaultCode: string = 'using System;\n' +
+    '\n' +
+    'Console.WriteLine("Hello world");\n';
+
   constructor(private _httpClient: HttpClient) {
   }
 
