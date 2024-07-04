@@ -38,7 +38,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 
     const initial = this.getLanguageAndCode();
     const ms = mirrorsharp(this.editorContainer.nativeElement, {
-      serviceUrl: `ws://${environment.apiUrl}/mirrorsharp`,
+      serviceUrl: `wss://${environment.apiUrl}/mirrorsharp`,
       language: initial.language,
       text: initial.code,
       serverOptions: (initial.mode !== 'regular' ? {'x-mode': initial.mode} : {})
