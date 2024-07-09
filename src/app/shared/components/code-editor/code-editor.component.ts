@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import mirrorsharp from "mirrorsharp-codemirror-6-preview";
+import mirrorsharp, {MirrorSharpInstance} from "mirrorsharp-codemirror-6-preview";
 import {environment} from "src/environments/environment";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-code-editor',
@@ -13,7 +14,9 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 
   @Input('code') code: string = '';
 
-  constructor() {
+  private mirrorsharp: MirrorSharpInstance<{ "x-mode": any; } | {}> | undefined;
+
+  constructor(private _http: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -37,7 +40,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
 
     const initial = this.getLanguageAndCode();
-    const ms = mirrorsharp(this.editorContainer.nativeElement, {
+    this.mirrorsharp = mirrorsharp(this.editorContainer.nativeElement, {
       serviceUrl: `wss://${environment.apiUrl}/mirrorsharp`,
       language: initial.language,
       text: initial.code,
@@ -45,10 +48,25 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
     });
     window.addEventListener('hashchange', () => {
       const updated = this.getLanguageAndCode();
-      ms.setLanguage(updated.language);
-      ms.setServerOptions({'x-mode': updated.mode});
-      ms.setText(updated.code);
+      this.mirrorsharp!.setLanguage(updated.language);
+      this.mirrorsharp!.setServerOptions({'x-mode': updated.mode});
+      this.mirrorsharp!.setText(updated.code);
     });
   }
 
+  runCode() {
+    const code = this.mirrorsharp!.getText();
+
+    this._http
+      .post<{ id: string }>(`https://${environment.apiUrl}/coderunner/schedule`, {
+        code: code
+      })
+      .subscribe({
+        next: response => {
+          console.log(`launched coderun`, response.id)
+        }, error: (err) => {
+          console.error('launching code run failed ', err)
+        }
+      })
+  }
 }
