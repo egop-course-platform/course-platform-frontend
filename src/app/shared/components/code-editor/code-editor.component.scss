@@ -1,6 +1,139 @@
-.editor {
-  border-radius: 8px;
-  border: 2px solid blue;
-  overflow: auto;
-  max-width: 600px;
+.editor-wrapper {
+  display: flex;
+
+  .editor {
+    border-radius: 8px;
+    border-top: 2px solid rgba(0, 0, 255, 0.3);
+    border-right: none;
+    border-left: 2px solid rgba(0, 0, 255, 0.3);
+    border-bottom: 2px solid rgba(0, 0, 255, 0.3);
+
+    box-shadow: -6px 0px 4px 0px rgba(0, 0, 255, 0.3) inset;
+    overflow: auto;
+    max-width: 50%;
+    position: relative;
+    width: 50%;
+
+    .statuser {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 8px 8px 0 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      $gap : 2px;
+      $border : 2px;
+      $padding : 1px;
+      gap: $gap;
+      overflow: hidden;
+      padding-right: 6px;
+      padding-bottom: 6px;
+
+      .stack-root {
+        position: relative;
+
+        width: calc(24px + $border + $padding);
+        height: calc(24px + $border + $padding);
+      }
+
+      .icon {
+        border-radius: 8px;
+        border: $border solid aquamarine;
+        box-sizing: border-box;
+        box-shadow: 2px 2px 4px 0 rgba(127, 255, 212, 0.5);
+        width: calc(24px + $border + $padding);
+        height: calc(24px + $border + $padding);
+        background: white;
+
+        &.stack {
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
+        &.failed {
+          border: 2px solid red;
+          box-shadow: 2px 2px 2px 0px rgba(255,0,0,0.5);
+        }
+
+        .action {
+          cursor: pointer;
+        }
+        &:empty{
+          display: none;
+        }
+      }
+
+      .progress {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        right: calc(4px - 2px);
+        width: calc(24px + $border + $padding);
+        height: calc(24px + $border + $padding);
+      }
+    }
+  }
+  .output {
+    border-radius: 8px;
+    border-top: 2px solid rgba(0, 0, 255, 0.3) ;
+    border-right: 2px solid rgba(0, 0, 255, 0.3) ;
+    border-left: none;
+    border-bottom: 2px solid rgba(0, 0, 255, 0.3) ;
+    overflow: auto;
+    width: 50%;
+    word-wrap: normal;
+    padding: 0 0 0 8px;
+    box-shadow: 6px 0px 4px 0px rgba(0, 0, 255, 0.3) inset;
+  }
+}
+
+.dot-flashing {
+  position: relative;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: black;
+  color: black;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+}
+.dot-flashing::before, .dot-flashing::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: black;
+  color: black;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: black;
+  color: black;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% {
+    background-color: black;
+  }
+  50%, 100% {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
 }

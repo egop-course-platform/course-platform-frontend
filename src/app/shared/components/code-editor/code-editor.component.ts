@@ -2,11 +2,17 @@ import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@a
 import mirrorsharp, {MirrorSharpInstance} from "mirrorsharp-codemirror-6-preview";
 import {environment} from "src/environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {
+  fadeInRightOnEnterAnimation, fadeOutRightOnLeaveAnimation,
+  rotateInOnEnterAnimation, rotateOutOnLeaveAnimation,
+  tadaOnEnterAnimation
+} from 'angular-animations';
 
 @Component({
   selector: 'app-code-editor',
   templateUrl: './code-editor.component.html',
-  styleUrls: ['./code-editor.component.scss']
+  styleUrls: ['./code-editor.component.scss'],
+  animations: [tadaOnEnterAnimation(), rotateInOnEnterAnimation(), rotateOutOnLeaveAnimation(), fadeInRightOnEnterAnimation(), fadeOutRightOnLeaveAnimation()],
 })
 export class CodeEditorComponent implements OnInit, AfterViewInit {
 
@@ -15,6 +21,13 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
   @Input('code') code: string = '';
 
   private mirrorsharp: MirrorSharpInstance<{ "x-mode": any; } | {}> | undefined;
+
+  outputLines: string[] = [];
+
+  sendStatus: string = 'none';
+  buildStatus: string = 'none';
+  runStatus: string = 'none';
+  failed: boolean = false;
 
   constructor(private _http: HttpClient) {
   }
@@ -55,18 +68,58 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
   }
 
   runCode() {
+    this.outputLines = [];
+    this.buildStatus = 'none';
+    this.runStatus = 'none';
+    this.sendStatus = 'none';
+
+    const ws = new WebSocket(`wss://${environment.apiUrl}/coderunner/runner`);
     const code = this.mirrorsharp!.getText();
 
-    this._http
-      .post<{ id: string }>(`https://${environment.apiUrl}/coderunner/schedule`, {
-        code: code
-      })
-      .subscribe({
-        next: response => {
-          console.log(`launched coderun`, response.id)
-        }, error: (err) => {
-          console.error('launching code run failed ', err)
+    this.sendStatus = 'sending';
+    ws.onopen = ev => {
+      ws.send(JSON.stringify({command: 'run', code: code}));
+      this.sendStatus = 'pending';
+    }
+    ws.onmessage = ev => {
+      const response = JSON.parse(ev.data);
+      switch (response.action) {
+        case 'build': {
+          this.buildStatus = response.result;
+          if (response.result === 'failed'){
+            this.failed = true;
+            this.outputLines = response.errorLines;
+          }
+          break;
         }
-      })
+        case 'run': {
+          this.runStatus = response.result;
+          if (response.result === 'failed'){
+            this.failed = true;
+            this.outputLines = response.errorLines;
+          }
+        }
+      }
+      if (response.outputLines !== undefined) {
+        this.outputLines = response.outputLines;
+      }
+    };
+    ws.onclose = ev => {
+      this.sendStatus = 'finished';
+    };
+  }
+
+  animState = false;
+
+  animDone() {
+    this.animState = !this.animState;
+  }
+
+  resetRun() {
+    this.outputLines = [];
+    this.buildStatus = 'none';
+    this.runStatus = 'none';
+    this.sendStatus = 'none';
+    this.failed = false;
   }
 }

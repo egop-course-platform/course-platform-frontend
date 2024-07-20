@@ -1,3 +1,47 @@
-<div class="editor" #editorcontainer></div>
+<div class="editor-wrapper">
 
-<button (click)="runCode()">Run</button>
+  <div class="editor" #editorcontainer>
+    <div class="statuser">
+      <div class="stack-root">
+        <div class="icon stack" *ngIf="sendStatus === 'none'" [ngClass]="{'failed': failed}" [@fadeInRightOnEnter]
+             [@fadeOutRightOnLeave]>
+          <mat-icon class="action" [@tadaOnEnter]
+                    (click)="runCode()">play_arrow
+          </mat-icon>
+        </div>
+        <div class="icon stack" *ngIf="sendStatus === 'sending'" [ngClass]="{'failed': failed}" [@fadeInRightOnEnter]
+             [@fadeOutRightOnLeave]>
+          <mat-icon>forward_to</mat-icon>
+        </div>
+        <div class="icon stack" *ngIf="sendStatus === 'pending'" [ngClass]="{'failed': failed}" [@fadeInRightOnEnter]
+             [@fadeOutRightOnLeave]>
+          <mat-icon>query_builder</mat-icon>
+        </div>
+        <div class="icon stack" *ngIf="sendStatus === 'finished'" [ngClass]="{'failed': failed}" [@fadeInRightOnEnter]
+             [@fadeOutRightOnLeave]>
+          <mat-icon [@tadaOnEnter]>add_task</mat-icon>
+        </div>
+      </div>
+      <div class="stack-root">
+        <div class="icon stack progress" [@fadeInRightOnEnter] [@fadeOutRightOnLeave]
+             *ngIf="sendStatus !== 'none' && sendStatus !== 'finished'">
+          <div class="dot-flashing"></div>
+        </div>
+        <div class="icon stack" [@fadeInRightOnEnter] [@fadeOutRightOnLeave] *ngIf="sendStatus === 'finished'">
+          <mat-icon class="action" (click)="resetRun()" *ngIf="sendStatus === 'finished'"
+                    [@rotateInOnEnter]
+                    [@rotateOutOnLeave]>autorenew
+          </mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="output">
+    <pre *ngFor="let line of outputLines">{{ line }}</pre>
+  </div>
+
+</div>
+
+<div>General: {{ sendStatus }}</div>
+<div>Build: {{ buildStatus }}</div>
+<div>Run: {{ runStatus }}</div>
